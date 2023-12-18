@@ -1,0 +1,10 @@
+
+train: C:/Users/sshak/Documents/GitHub/AER850_Project3/data/train/images/train.txt
+val: C:/Users/sshak/Documents/GitHub/AER850_Project3/data/train/images/val.txt
+
+nc: 1  # Number of classes (adjust based on your dataset)
+names: ['component']  # Class names
+
+epochs: 50
+batch_size: 16
+img_size: 900
