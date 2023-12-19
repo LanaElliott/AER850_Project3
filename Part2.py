@@ -1,47 +1,46 @@
 import os
 import shutil
 import yaml
+import torch
 
-# Set up directory paths
+# Set up directory paths 
 project_path = 'C:/Users/sshak/Documents/GitHub/AER850_Project3'
 dataset_path = 'C:/Users/sshak/Documents/GitHub/AER850_Project3/data/train/images'
 yaml_path = 'C:/Users/sshak/Documents/GitHub/AER850_Project3/data/data.yaml'
 from ultralytics import YOLO
 
 # Load a model
-model = YOLO('yolov8n.yaml')  # build a new model from YAML
-model = YOLO('yolov8n.pt')  # load a pretrained model (recommended for training)
-model = YOLO('yolov8n.yaml').load('yolov8n.pt')  # build from YAML and transfer weights
+model = YOLO('yolov8n.pt') 
 
 # Train the model
-results = model.train(data='C:/Users/sshak/Documents/GitHub/AER850_Project3/data/data.yaml', epochs=10, imgsz=900, batch=10)
+results = model.train(data='C:/Users/sshak/Documents/GitHub/AER850_Project3/data/data.yaml', epochs=5, imgsz=900, batch=16)
 
-# Install dependencies
-os.system("pip install -U -r requirements.txt")
+metrics = model.val()
 
-# Create a YAML configuration file
-config_content = f"""
-train: {dataset_path}/train.txt
-val: {dataset_path}/val.txt
+#-- Part 3
+from PIL import Image
+from ultralytics import YOLO
+import time
 
-nc: 1  # Number of classes (adjust based on your dataset)
-names: ['component']  # Class names
+results1 = model('C:/Users/sshak/Documents/GitHub/AER850_Project3/data/evaluation/ardmega.jpg')
+results2 = model('C:/Users/sshak/Documents/GitHub/AER850_Project3/data/evaluation/arduno.jpg')
+results3 = model('C:/Users/sshak/Documents/GitHub/AER850_Project3/data/evaluation/rasppi.jpg')
+# Evaluate the model
 
-epochs: 50
-batch_size: 16
-img_size: 900
-"""
+for r1 in results1:
+    im_array = r1.plot() 
+    im = Image.fromarray(im_array[..., ::-1])
+    im.show()
+    im.save('results1.jpg')
 
-with open('yolov8_config.yaml', 'w') as config_file:
-    config_file.write(config_content)
+for r2 in results2:
+    im_array = r2.plot() 
+    im = Image.fromarray(im_array[..., ::-1])
+    im.show()
+    im.save('results2.jpg')
 
-# Copy YOLOv5 weights as a starting point
-shutil.copy('yolov5s.pt', 'yolov5s_initial.pt')
-
-# Training command
-training_command = """
-python train.py --img 900 --batch 16 --epochs 50 --data yolov8_config.yaml --weights yolov5s_initial.pt
-"""
-
-# Run training command
-os.system(training_command)
+for r3 in results3:
+    im_array = r3.plot() 
+    im = Image.fromarray(im_array[..., ::-1])
+    im.show()
+    im.save('results3.jpg')
